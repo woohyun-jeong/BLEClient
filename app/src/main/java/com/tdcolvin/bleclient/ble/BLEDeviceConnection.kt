@@ -61,11 +61,11 @@ class BLEDeviceConnection @RequiresPermission("PERMISSION_BLUETOOTH_CONNECT") co
 
     private var privateKey: PrivateKey? = null
     private var receivePublicKey: PublicKey? = null
-    private val TAG = "TTTT"
     var mtuSize = 0
     private var offset = 0
     private var readService: BluetoothGattService? = null
     private var readCharacteristic: BluetoothGattCharacteristic? = null
+    private val TAG: String = BLEDeviceConnection::class.java.simpleName
 
     private val callback = object: BluetoothGattCallback() {
         // MTU 요청 결과를 처리하는 콜백
@@ -329,11 +329,13 @@ class BLEDeviceConnection @RequiresPermission("PERMISSION_BLUETOOTH_CONNECT") co
     }
 
     /**
-     * @brief write test1
+     * @brief write test1 : 큰 용량의 데이터 write
      */
     @SuppressLint("MissingPermission")
-    private fun writeTest1(offset:Int = 0, fullData:ByteArray = byteArrayOf()) {
-        var clientOffset = clientOffset
+    private fun writeTest1(offset:Int = 0) {
+        val functionName = Thread.currentThread().stackTrace[1].methodName
+
+        var clientOffset = offset
         val data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefEND_OF_DATA"
 
         val service = gatter?.getService(CTF_SERVICE_UUID)
@@ -342,39 +344,91 @@ class BLEDeviceConnection @RequiresPermission("PERMISSION_BLUETOOTH_CONNECT") co
         gatter?.setCharacteristicNotification(characteristic, true)
 
         if (characteristic != null) {
-            // 특성 값이 너무 크면 데이터를 MTU 크기만큼 나누어 전송
-            val dataBytes = data.toByteArray(Charset.forName("UTF-8"))
-            // MTU 크기 계산 (오버헤드를 고려하여 실제 데이터 전송 크기 계산)
-            val mtuSize = mtuSize - 3 // 헤더 크기 등 고려
-            // 요청된 오프셋에 해당하는 데이터 범위 계산
-            val endOffset = minOf(clientOffset + mtuSize, dataBytes.size)
-            Log.d("BLE Server offset", clientOffset.toString())
-            Log.d("BLE Server endOffset", endOffset.toString())
+            val dataBytes = data.toByteArray(Charset.forName("UTF-8")) // 특성 값이 너무 크면 데이터를 MTU 크기만큼 나누어 전송
+            val mtuSize = mtuSize - 3 // 헤더 크기 등 고려 (오버헤드를 고려하여 실제 데이터 전송 크기 계산)
+            val endOffset = minOf(clientOffset + mtuSize, dataBytes.size) // 요청된 오프셋에 해당하는 데이터 범위 계산
+            Log.d(TAG + functionName,"offset :" + "${clientOffset}")
+            Log.d(TAG + functionName,"endOffset :" + "${endOffset}")
 
             if (clientOffset < dataBytes.size) {
                 val dataChunk = dataBytes.copyOfRange(clientOffset, endOffset)
-                Log.d("BLE Server", "Sending data chunk: ${String(dataChunk)}")
+                Log.d(TAG + functionName,"Sending data chunk :" + "${endOffset}")
 
                 characteristic.value = dataChunk
                 // 서버에 데이터 전송
                 val success = gatter?.writeCharacteristic(characteristic)
-                Log.v("bluetooth", "Write status: $success")
+                Log.d(TAG + functionName,"Write status :" + "${success}")
+
                 clientOffset = endOffset - 2
                 // 데이터가 아직 남아 있다면, 이어서 요청을 처리
                 if (endOffset < dataBytes.size) {
-                    Log.d("BLE Server", "Remaining data, waiting for next read request")
+                    Log.d(TAG + functionName,"Remaining data, waiting for next read request")
                     CoroutineScope(Dispatchers.IO).launch {
                         delay(1000)
-                        writeTest1()
+                        writeTest1(clientOffset)
                     }
                 } else {
-                    Log.d("BLE Server", "Data transmission complete.")
+                    Log.d(TAG + functionName,"Data transmission complete.")
                 }
             } else {
                 // 요청된 offset이 데이터 범위를 벗어나면 오류 응답
             }
         }
+
     }
+
+    /**
+     * @brief write test2 : 작은 용량의 데이터 write
+     */
+    @SuppressLint("MissingPermission")
+    private fun writeTest2() {
+        val functionName = Thread.currentThread().stackTrace[1].methodName
+
+        val service = gatter?.getService(CTF_SERVICE_UUID)
+        val characteristic = service?.getCharacteristic(DATA_CHARACTERISTIC_UUID)
+
+        val success = gatter?.writeCharacteristic(characteristic)
+        Log.v(TAG + functionName, "Write status: $success")
+
+    }
+
+    /**
+     * @brief write public key
+     */
+    @SuppressLint("MissingPermission")
+    private fun writeTest3() {
+        val functionName = Thread.currentThread().stackTrace[1].methodName
+
+        val service = gatter?.getService(CTF_SERVICE_UUID)
+        val characteristic = service?.getCharacteristic(PUBLICK_KEY_DATA_CHARACTERISTIC_UUID)
+        if (characteristic != null) {
+            generateKeyPair().apply {
+                publicKey = this.first
+                privateKey = this.second
+            }
+
+            Log.d(TAG + functionName,"public key (String): " + publicKey!!.encoded.decodeToString())
+            Log.d(TAG + functionName,"public key (String) size: " + publicKey!!.encoded.decodeToString().length.toString())
+            Log.d(TAG + functionName,"public key (Byte): " + "${publicKey}")
+            Log.d(TAG + functionName,"public key (Byte) size: " + publicKey!!.encoded.size.toString())
+            Log.d(TAG + functionName,"public format: " + "${publicKey!!.format}")
+            Log.d(TAG + functionName,"public key :" + publicKeyToString(publicKey!!))
+
+            Log.d("TTTT public Base64 size :", publicKeyToString(publicKey!!).length.toString())
+            Log.d("TTTT privateKey key :", priveKeyToString(privateKey!!))
+            Log.d("TTTT publicKey key byte size :", base64ToByteArray(publicKeyToString(publicKey!!)).size.toString())
+            Log.d("TTTT sendData :", "String = ${android.util.Base64.encode(sendData(publicKey!!), android.util.Base64.NO_PADDING).decodeToString()}")
+
+            characteristic.value = sendData(publicKey!!)
+
+            val success = gatter?.writeCharacteristic(characteristic)
+            Log.v("bluetooth", "Write status: $success")
+        } else {
+            Log.v("bluetooth", "Write func error")
+
+        }
+    }
+
 
     @SuppressLint("MissingPermission")
     fun sendPublicKey() {
