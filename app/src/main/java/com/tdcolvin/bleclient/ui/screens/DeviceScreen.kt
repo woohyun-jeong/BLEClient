@@ -4,15 +4,12 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.tdcolvin.bleclient.ble.CTF_SERVICE_UUID
 
@@ -21,12 +18,14 @@ fun DeviceScreen(
     unselectDevice: () -> Unit,
     isDeviceConnected: Boolean,
     discoveredCharacteristics: Map<String, List<String>>,
-    password: String?,
-    nameWrittenTimes: Int,
     connect: () -> Unit,
     discoverServices: () -> Unit,
-    readPassword: () -> Unit,
-    injectionData: () -> Unit,
+    scenarioTest1: () -> Unit,
+    scenarioTest2: () -> Unit,
+    scenarioTest3: () -> Unit,
+    scenarioTest4: () -> Unit,
+    scenarioTest5: () -> Unit,
+    scenarioTest6: () -> Unit,
     sendPublicKey: () -> Unit,
     receivePublicKey: () -> Unit,
     publicKey: String?
@@ -43,33 +42,33 @@ fun DeviceScreen(
         Button(onClick = discoverServices, enabled = isDeviceConnected) {
             Text("2. Discover Services")
         }
-        LazyColumn {
-            items(discoveredCharacteristics.keys.sorted()) { serviceUuid ->
-                Text(text = serviceUuid, fontWeight = FontWeight.Black)
-                Column(modifier = Modifier.padding(start = 10.dp)) {
-                    discoveredCharacteristics[serviceUuid]?.forEach {
-                        Text(it)
-                    }
-                }
-            }
+//        LazyColumn {
+//            items(discoveredCharacteristics.keys.sorted()) { serviceUuid ->
+//                Text(text = serviceUuid, fontWeight = FontWeight.Black)
+//                Column(modifier = Modifier.padding(start = 10.dp)) {
+//                    discoveredCharacteristics[serviceUuid]?.forEach {
+//                        Text(it)
+//                    }
+//                }
+//            }
+//        }
+        Button(onClick = scenarioTest1, enabled = isDeviceConnected && foundTargetService) {
+            Text("시나리오 테스트 1")
         }
-        Button(onClick = readPassword, enabled = isDeviceConnected && foundTargetService) {
-            Text("3. Read Password")
+        Button(onClick = scenarioTest2, enabled = isDeviceConnected && foundTargetService) {
+            Text("시나리오 테스트 2")
         }
-        if (password != null) {
-            Text("Found password: $password")
+        Button(onClick = scenarioTest3, enabled = isDeviceConnected && foundTargetService) {
+            Text("시나리오 테스트 3")
         }
-        Button(onClick = injectionData, enabled = isDeviceConnected && foundTargetService) {
-            Text("4. Injection Data")
+        Button(onClick = scenarioTest4, enabled = isDeviceConnected && foundTargetService) {
+            Text("시나리오 테스트 4")
         }
-        Button(onClick = sendPublicKey, enabled = isDeviceConnected && foundTargetService) {
-            Text("5. send public Key")
+        Button(onClick = scenarioTest5, enabled = isDeviceConnected && foundTargetService) {
+            Text("시나리오 테스트 5")
         }
-        Button(onClick = receivePublicKey, enabled = isDeviceConnected && foundTargetService) {
-            Text("6. receive public Key")
-        }
-        if (nameWrittenTimes > 0) {
-            Text("Successful writes: $nameWrittenTimes")
+        Button(onClick = scenarioTest6, enabled = isDeviceConnected && foundTargetService) {
+            Text("시나리오 테스트 6")
         }
         if (publicKey != null) {
             Text("public key: $publicKey")

@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.AndroidViewModel
@@ -13,6 +14,7 @@ import com.tdcolvin.bleclient.ble.BLEDeviceConnection
 import com.tdcolvin.bleclient.ble.BLEScanner
 import com.tdcolvin.bleclient.ble.PERMISSION_BLUETOOTH_CONNECT
 import com.tdcolvin.bleclient.ble.PERMISSION_BLUETOOTH_SCAN
+import com.tdcolvin.bleclient.ble.SCENARIO
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +28,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 class BLEClientViewModel(private val application: Application): AndroidViewModel(application) {
     private val bleScanner = BLEScanner(application).apply {
-
     }
     private var activeConnection = MutableStateFlow<BLEDeviceConnection?>(null)
 
@@ -34,14 +35,8 @@ class BLEClientViewModel(private val application: Application): AndroidViewModel
     private val activeDeviceServices = activeConnection.flatMapLatest {
         it?.services ?: flowOf(emptyList())
     }
-    private val activeDevicePassword = activeConnection.flatMapLatest {
-        it?.passwordRead ?: flowOf(null)
-    }
     private val activePublicKey = activeConnection.flatMapLatest {
         it?.publicKeyRead ?: flowOf(null)
-    }
-    private val activeDeviceNameWrittenTimes = activeConnection.flatMapLatest {
-        it?.successfulNameWrites ?: flowOf(0)
     }
 
     private val _uiState = MutableStateFlow(BLEClientUIState())
@@ -49,15 +44,12 @@ class BLEClientViewModel(private val application: Application): AndroidViewModel
         _uiState,
         isDeviceConnected,
         activeDeviceServices,
-        activePublicKey,
-        activeDeviceNameWrittenTimes,
-
-    ) { state, isDeviceConnected, services, publickey, nameWrittenTimes ->
+        activePublicKey
+    ) { state, isDeviceConnected, services, publickey ->
         state.copy(
             isDeviceConnected = isDeviceConnected,
             discoveredCharacteristics = services.associate { service -> Pair(service.uuid.toString(), service.characteristics.map { it.uuid.toString() }) },
             publicKey = publickey,
-            nameWrittenTimes = nameWrittenTimes
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), BLEClientUIState())
 
@@ -94,11 +86,13 @@ class BLEClientViewModel(private val application: Application): AndroidViewModel
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
     fun connectActiveDevice() {
         activeConnection.value?.connect()
+        Log.d("BLEDeviceConnection ", activeConnection.value.hashCode().toString())
     }
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
     fun disconnectActiveDevice() {
         activeConnection.value?.disconnect()
+        activeConnection.value = null
     }
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
@@ -107,28 +101,53 @@ class BLEClientViewModel(private val application: Application): AndroidViewModel
     }
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
-    fun readPasswordFromActiveDevice() {
-        activeConnection.value?.readPassword()
+    fun scenarioTest1ToActiveDevice() {
+        activeConnection.value?.getScenarioTest(SCENARIO.SCENARIO_1)?.senarioTest1_write()
     }
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
-    fun writeNameToActiveDevice() {
-        activeConnection.value?.writeName()
+    fun scenarioTest2ToActiveDevice() {
+        activeConnection.value?.getScenarioTest(SCENARIO.SCENARIO_2)?.senarioTest2_write()
     }
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
-    fun injectionDataToActiveDevice() {
-        activeConnection.value?.injectionData()
+    fun scenarioTest3ToActiveDevice() {
+        activeConnection.value?.getScenarioTest(SCENARIO.SCENARIO_3)?.senarioTest3_write()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun scenarioTest4ToActiveDevice() {
+        activeConnection.value?.getScenarioTest(SCENARIO.SCENARIO_4)?.senarioTest4_write()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun scenarioTest5ToActiveDevice() {
+        activeConnection.value?.getScenarioTest(SCENARIO.SCENARIO_5)?.senarioTest5_write()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun scenarioTest6ToActiveDevice() {
+        activeConnection.value?.getScenarioTest(SCENARIO.SCENARIO_6)?.senarioTest6_read_request()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun scenarioTest7ToActiveDevice() {
+        activeConnection.value?.getScenarioTest(SCENARIO.SCENARIO_7)?.senarioTest2_write()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun scenarioTest8ToActiveDevice() {
+        activeConnection.value?.getScenarioTest(SCENARIO.SCENARIO_8)?.senarioTest2_write()
     }
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
     fun sendPublicKeyToActiveDevice() {
-        activeConnection.value?.sendPublicKey()
+//        activeConnection.value?.sendPublicKey()
     }
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
     fun receivePublicKeyToActiveDevice() {
-        activeConnection.value?.receivePublicKey()
+//        activeConnection.value?.receivePublicKey()
     }
 
     override fun onCleared() {
@@ -153,7 +172,5 @@ data class BLEClientUIState(
     val activeDevice: BluetoothDevice? = null,
     val isDeviceConnected: Boolean = false,
     val discoveredCharacteristics: Map<String, List<String>> = emptyMap(),
-    val password: String? = null,
-    val nameWrittenTimes: Int = 0,
     val publicKey: String? = null
 )
