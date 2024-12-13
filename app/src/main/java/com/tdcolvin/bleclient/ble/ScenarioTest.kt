@@ -28,14 +28,13 @@ class ScenarioTest(gatter: BluetoothGatt, mtuSize: Int, scenario: SCENARIO) {
     var clientOffset = 0
     var scenario = scenario
     var fullData:ByteArray? = byteArrayOf()
+    val data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccccccceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefffffffffffffffffffffffffffffffffffffffffdddddddddddddddddddddddddddddddddddddddddd하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이END_OF_DATA"
 
     @SuppressLint("MissingPermission")
     fun senarioTest1_write(offset:Int = 0) {
         val functionName = "senarioTest1_write"
 
         var clientOffset = offset
-        val data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccccccceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefffffffffffffffffffffffffffffffffffffffffdddddddddddddddddddddddddddddddddddddddddd하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이END_OF_DATA"
-
         val service = gatter.getService(CTF_SERVICE_UUID)
         val characteristic = service?.getCharacteristic(DATA_CHARACTERISTIC_UUID)
         characteristic?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
@@ -80,8 +79,6 @@ class ScenarioTest(gatter: BluetoothGatt, mtuSize: Int, scenario: SCENARIO) {
         val functionName = "senarioTest1_write"
 
         var clientOffset = offset
-        val data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccccccceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefffffffffffffffffffffffffffffffffffffffffdddddddddddddddddddddddddddddddddddddddddd하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이END_OF_DATA"
-
         val service = gatter.getService(CTF_SERVICE_UUID)
         val characteristic = service?.getCharacteristic(DATA_CHARACTERISTIC_UUID)
         characteristic?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
@@ -127,8 +124,6 @@ class ScenarioTest(gatter: BluetoothGatt, mtuSize: Int, scenario: SCENARIO) {
         val functionName = "senarioTest1_write"
 
         var clientOffset = offset
-        val data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccccccceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefffffffffffffffffffffffffffffffffffffffffdddddddddddddddddddddddddddddddddddddddddd하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이END_OF_DATA"
-
         val service = gatter.getService(CTF_SERVICE_UUID)
         val characteristic = service?.getCharacteristic(DATA_CHARACTERISTIC_UUID)
         characteristic?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
@@ -178,8 +173,6 @@ class ScenarioTest(gatter: BluetoothGatt, mtuSize: Int, scenario: SCENARIO) {
         val functionName = "senarioTest1_write"
 
         var clientOffset = offset
-        val data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccccccceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefffffffffffffffffffffffffffffffffffffffffdddddddddddddddddddddddddddddddddddddddddd하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이END_OF_DATA"
-
         val service = gatter.getService(CTF_SERVICE_UUID)
         val characteristic = service?.getCharacteristic(DATA_CHARACTERISTIC_UUID)
         characteristic?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
@@ -229,8 +222,6 @@ class ScenarioTest(gatter: BluetoothGatt, mtuSize: Int, scenario: SCENARIO) {
         val functionName = "senarioTest1_write"
 
         var clientOffset = offset
-        val data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccccccceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefffffffffffffffffffffffffffffffffffffffffdddddddddddddddddddddddddddddddddddddddddd하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이하이END_OF_DATA"
-
         val service = gatter.getService(CTF_SERVICE_UUID)
         val characteristic = service?.getCharacteristic(DATA_CHARACTERISTIC_UUID)
         characteristic?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
